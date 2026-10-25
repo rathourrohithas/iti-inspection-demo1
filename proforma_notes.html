@@ -1,0 +1,6 @@
+{% extends "inspections/base.html" %}
+{% block content %}
+<div class="card"><h1>Notes on the digital proforma</h1>
+<p>The portal reproduces the approved ITI Inspection Proforma. The following corrections, approved by the Directorate, were applied while digitising it:</p>
+<ol>{% for c in corrections %}<li>{{ c }}</li>{% endfor %}</ol></div>
+{% endblock %}

@@ -1,0 +1,8 @@
+{% extends "inspections/base.html" %}
+{% block title %}Assign inspection{% endblock %}
+{% block content %}
+<div class="pagehead"><h1>{% if obj %}Edit assignment{% else %}Assign inspection{% endif %}</h1><a class="btn" href="{% url 'assignments_list' %}">Back</a></div>
+<div class="card"><form method="post" class="formgrid">{% csrf_token %}{% include "inspections/_form_fields.html" %}
+<div class="actions"><button class="btn primary" type="submit">Save and set section permissions</button></div></form>
+<p class="help">Only users with the “Inspecting officer” role appear here. The ITI details and team are pre-filled into Part A and J8 of the form, where the team can still edit them.</p></div>
+{% endblock %}

@@ -1,0 +1,8 @@
+.env
+db.sqlite3
+media/
+staticfiles/
+backups/
+deploy/certs/
+__pycache__/
+*.pyc

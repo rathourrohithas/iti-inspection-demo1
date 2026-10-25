@@ -1,0 +1,59 @@
+{% extends "inspections/base.html" %}
+{% load static %}
+{% block title %}Review — {{ insp.iti.name }}{% endblock %}
+{% block bodyclass %}form-page{% endblock %}
+{% block content %}
+<div class="formhead">
+  <div>
+    <h1>Review: {{ insp.iti.name }}</h1>
+    <p class="muted">{{ insp.iti.mis_code }} · {{ insp.team_name }} · {% include "inspections/_status.html" with s=insp.status %}</p>
+  </div>
+  <div class="actions tight">
+    {% if not insp.is_locked %}<a class="btn" href="{% url 'inspection_form' insp.pk %}">Back to data entry</a>{% endif %}
+  </div>
+</div>
+<div id="pending-warning" class="msg msg-warning" hidden>Some entries made on this device have not yet reached the server. Go back to data entry while online so they are sent, then return here.</div>
+<div class="grid2">
+  <div class="card">
+    <h2>Completeness — {{ overall.done }} of {{ overall.total }} items answered ({{ overall.pct }}%)</h2>
+    <table class="table small"><thead><tr><th>Part</th><th class="num">Answered</th><th style="width:40%">Progress</th></tr></thead><tbody>
+    {% for p in parts_summary %}<tr><td>{{ p.section }} · {{ p.title }}</td><td class="num">{{ p.done }} / {{ p.total }}</td><td><div class="bar"><span style="width:{{ p.pct }}%"></span></div></td></tr>{% endfor %}
+    </tbody></table>
+  </div>
+  <div class="card">
+    <h2>Before submission</h2>
+    {% if missing %}
+      <div class="msg msg-error"><strong>Mandatory items not answered ({{ missing|length }}):</strong>
+        <ul>{% for u in missing %}<li>{{ u.sno }} — {{ u.label|truncatechars:90 }}</li>{% endfor %}</ul></div>
+    {% else %}<p class="ok">✔ All items marked mandatory by the Directorate are answered.</p>{% endif %}
+    {% if invalid %}
+      <div class="msg msg-error"><strong>Entries to correct:</strong><ul>{% for k, u, e in invalid %}<li>{% if u %}{{ u.sno }}{% else %}{{ k }}{% endif %}: {{ e }}</li>{% endfor %}</ul></div>
+    {% endif %}
+    <h3>J8 declarations</h3>
+    <ul class="plain">{% for m in members %}<li>{% if m.declared %}✔{% else %}○{% endif %} {{ m.name }} {% if m.declared %}<span class="muted">declared {{ m.declared_at }}</span>{% else %}<span class="muted">not yet declared</span>{% endif %}</li>{% empty %}<li class="muted">No members listed.</li>{% endfor %}</ul>
+    {% if unanswered %}
+    <details><summary>{{ unanswered|length }} item(s) left blank</summary>
+      <ul class="small">{% for u in unanswered %}<li>{{ u.sno }} — {{ u.label|truncatechars:80 }}</li>{% endfor %}</ul></details>
+    {% endif %}
+    {% if can_submit %}
+      <form method="post" action="{% url 'inspection_submit' insp.pk %}" class="submitbox" id="submitform">{% csrf_token %}
+        <label class="check"><input type="checkbox" name="confirm" value="yes" required> I have reviewed the complete form and confirm it is ready for final submission. After submission the form will be locked.</label>
+        <button class="btn primary" type="submit" {% if missing or invalid %}disabled{% endif %} data-confirm="Submit this inspection? The form will be locked and sent to the Directorate.">Final submission</button>
+      </form>
+    {% elif not insp.is_locked %}
+      <p class="muted">Only the team leader can make the final submission.</p>
+    {% endif %}
+  </div>
+</div>
+<h2 class="sectionhead">Complete form (read-only preview)</h2>
+<div class="formlayout">
+  <aside class="partnav" id="partnav"></aside>
+  <section id="formroot" class="formroot"></section>
+</div>
+<div id="lightbox" class="lightbox" hidden><img alt=""><button type="button" class="btn">Close</button></div>
+{{ schema_json|json_script:"schema-data" }}
+{{ data_json|json_script:"form-data" }}
+{{ ctx_json|json_script:"ctx-data" }}
+{{ att_json|json_script:"att-data" }}
+{% endblock %}
+{% block scripts %}<script src="{% static 'inspections/form.js' %}"></script>{% endblock %}

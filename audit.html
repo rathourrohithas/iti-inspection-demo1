@@ -1,0 +1,17 @@
+{% extends "inspections/base.html" %}
+{% block title %}Audit log{% endblock %}
+{% block content %}
+<div class="pagehead"><h1>Audit log</h1></div>
+<form method="get" class="filters card">
+  <label>User<input name="user" value="{{ f.user }}"></label>
+  <label>Action<select name="action"><option value="">All</option>{% for a in actions %}<option {% if f.action == a %}selected{% endif %}>{{ a }}</option>{% endfor %}</select></label>
+  <label>Inspection no.<input name="inspection" value="{{ f.inspection }}" inputmode="numeric"></label>
+  <div class="actions tight"><button class="btn primary">Apply</button><a class="btn" href="?">Clear</a></div>
+</form>
+<div class="card"><div class="tablewrap"><table class="table small"><thead><tr><th>Date / time</th><th>User</th><th>Action</th><th>Inspection</th><th>Field</th><th>Old value</th><th>New value</th><th>Details</th><th>IP</th></tr></thead><tbody>
+{% for a in page %}<tr><td class="nowrap">{{ a.timestamp|date:"d-m-Y H:i:s" }}</td><td>{{ a.user.username|default:"—" }}</td><td>{{ a.action }}</td>
+<td>{% if a.inspection %}<a href="{% url 'record_view' a.inspection_id %}">#{{ a.inspection_id }}</a> {{ a.inspection.iti.name|truncatechars:30 }}{% endif %}</td>
+<td>{{ a.field_key }}</td><td class="clip">{{ a.old_value|truncatechars:80 }}</td><td class="clip">{{ a.new_value|truncatechars:80 }}</td><td class="clip">{{ a.details|truncatechars:120 }}</td><td>{{ a.ip|default:"" }}</td></tr>
+{% empty %}<tr><td colspan="9" class="muted">No entries.</td></tr>{% endfor %}
+</tbody></table></div>{% include "inspections/_pager.html" %}</div>
+{% endblock %}

@@ -1,0 +1,38 @@
+{% extends "inspections/base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<div class="pagehead"><h1>Inspection monitoring</h1><span class="muted">As on {{ today|date:"d M Y" }}</span></div>
+{% include "inspections/_filters.html" %}
+<div class="tiles">
+  <a class="tile" href="?{{ request.GET.urlencode }}"><b>{{ stats.total }}</b><span>ITIs scheduled for inspection</span></a>
+  <a class="tile t-ns" href="?status=NOT_STARTED"><b>{{ stats.not_started }}</b><span>Not yet started</span></a>
+  <a class="tile t-ip" href="?status=IN_PROGRESS"><b>{{ stats.in_progress }}</b><span>In progress{% if stats.returned %} (incl. {{ stats.returned }} returned){% endif %}</span></a>
+  <a class="tile t-sub" href="?status=SUBMITTED"><b>{{ stats.submitted }}</b><span>Completed and submitted</span></a>
+  <a class="tile t-od" href="?status=OVERDUE"><b>{{ stats.overdue }}</b><span>Pending beyond deadline</span></a>
+</div>
+<div class="grid2">
+  <div class="card"><h2>District-wise status</h2>
+    <div class="tablewrap"><table class="table small"><thead><tr><th>District</th><th class="num">Total</th><th class="num">Not started</th><th class="num">In progress</th><th class="num">Returned</th><th class="num">Submitted</th><th class="num">Overdue</th></tr></thead><tbody>
+    {% for d in district_rows %}<tr><td><a href="?district={{ d.district|urlencode }}">{{ d.district }}</a></td><td class="num">{{ d.total }}</td><td class="num">{{ d.NOT_STARTED }}</td><td class="num">{{ d.IN_PROGRESS }}</td><td class="num">{{ d.RETURNED }}</td><td class="num">{{ d.SUBMITTED }}</td><td class="num {% if d.overdue %}bad{% endif %}">{{ d.overdue }}</td></tr>
+    {% empty %}<tr><td colspan="7" class="muted">No inspections match the filters.</td></tr>{% endfor %}
+    </tbody></table></div></div>
+  <div class="card"><h2>Inspection team-wise progress</h2>
+    <div class="tablewrap"><table class="table small"><thead><tr><th>Team</th><th>Leader</th><th class="num">Assigned</th><th class="num">Submitted</th><th class="num">Overdue</th><th style="width:28%">Avg. progress</th></tr></thead><tbody>
+    {% for t in teams %}<tr><td>{{ t.team }}</td><td>{{ t.leader }}</td><td class="num">{{ t.assigned }}</td><td class="num">{{ t.submitted }}</td><td class="num {% if t.overdue %}bad{% endif %}">{{ t.overdue }}</td><td><div class="bar"><span style="width:{{ t.avg }}%"></span></div><small>{{ t.avg }}%</small></td></tr>
+    {% empty %}<tr><td colspan="6" class="muted">No teams.</td></tr>{% endfor %}
+    </tbody></table></div></div>
+</div>
+<div class="card"><h2>ITI-wise inspection status</h2>
+<div class="tablewrap"><table class="table small"><thead><tr><th>ITI</th><th>District</th><th>Team / leader</th><th>Scheduled visit</th><th>Date of inspection</th><th>Deadline</th><th>Date of submission</th><th>Status</th><th class="num">Progress</th><th></th></tr></thead><tbody>
+{% for i in items %}<tr class="{% if i.is_overdue %}row-overdue{% endif %}">
+  <td>{{ i.iti.name }}<br><small class="muted">{{ i.iti.mis_code }}</small></td><td>{{ i.iti.district }}</td>
+  <td>{{ i.team_name }}<br><small class="muted">{{ i.leader_obj.get_full_name|default:i.leader_obj.username|default:"—" }}</small></td>
+  <td>{{ i.scheduled_date|date:"d-m-Y" }}</td><td>{{ i.inspection_date|default:"—" }}</td>
+  <td>{{ i.deadline|date:"d-m-Y" }}{% if i.is_overdue %}<br><span class="badge st-overdue">Overdue</span>{% endif %}</td>
+  <td>{{ i.submitted_at|date:"d-m-Y H:i"|default:"—" }}</td>
+  <td>{% include "inspections/_status.html" with s=i.status %}</td>
+  <td class="num">{% if i.status == 'SUBMITTED' %}100{% else %}{{ i.progress_pct }}{% endif %}%</td>
+  <td><a href="{% url 'record_view' i.pk %}">Open</a></td></tr>
+{% empty %}<tr><td colspan="10" class="muted">No inspections match the filters.</td></tr>{% endfor %}
+</tbody></table></div></div>
+{% endblock %}

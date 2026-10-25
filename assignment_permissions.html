@@ -1,0 +1,16 @@
+{% extends "inspections/base.html" %}
+{% block title %}Section permissions{% endblock %}
+{% block content %}
+<div class="pagehead"><h1>Section permissions</h1><a class="btn" href="{% url 'assignments_list' %}">Back</a></div>
+<div class="card">
+<p><b>{{ insp.iti.name }}</b> · {{ insp.team_name }} · Visit {{ insp.scheduled_date|date:"d-m-Y" }}</p>
+<p>Team leader: <b>{{ leader.get_full_name|default:leader.username }}</b> — can view and edit all parts, and makes the final submission.</p>
+{% if not members %}<p class="muted">This team has no members besides the leader.</p>{% else %}
+<form method="post">{% csrf_token %}
+<p class="help">By default each member can edit all parts. Untick “All parts” to limit a member to selected parts. Every member can view the whole form.</p>
+<div class="tablewrap"><table class="table small permtable"><thead><tr><th>Part</th>{% for tm in members %}<th>{{ tm.user.get_full_name|default:tm.user.username }}<br><label class="check"><input type="checkbox" name="all_{{ tm.id }}" value="1" {% if not tm.sections %}checked{% endif %} data-allfor="{{ tm.id }}"> All parts</label></th>{% endfor %}</tr></thead>
+<tbody>{% for p in parts %}<tr><td>{{ p.section }} · {{ p.title }}</td>{% for tm in members %}<td class="center"><input type="checkbox" name="p_{{ tm.id }}_{{ p.key }}" value="1" data-member="{{ tm.id }}" {% if p.key in tm.sections %}checked{% endif %} aria-label="{{ p.title }}"></td>{% endfor %}</tr>{% endfor %}</tbody></table></div>
+<div class="actions"><button class="btn primary" type="submit">Save permissions</button></div>
+</form>{% endif %}
+</div>
+{% endblock %}

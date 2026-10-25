@@ -1,0 +1,15 @@
+{% extends "inspections/base.html" %}
+{% block title %}Inspection schedule{% endblock %}
+{% block content %}
+<div class="pagehead"><h1>Inspection schedule and team assignment</h1><div class="actions tight"><a class="btn" href="{% url 'assignment_import' %}">Import schedule</a><a class="btn primary" href="{% url 'assignment_create' %}">Assign inspection</a></div></div>
+{% include "inspections/_filters.html" %}
+<div class="card"><div class="tablewrap"><table class="table small"><thead><tr><th>ITI</th><th>Team</th><th>Leader</th><th>Members</th><th>Visit</th><th>Deadline</th><th>Status</th><th></th></tr></thead><tbody>
+{% for i in items %}<tr class="{% if i.is_overdue %}row-overdue{% endif %}"><td>{{ i.iti.name }}<br><small class="muted">{{ i.iti.mis_code }} · {{ i.iti.district }}</small></td><td>{{ i.team_name }}</td>
+<td>{{ i.leader_obj.get_full_name|default:i.leader_obj.username|default:"—" }}</td>
+<td>{% for m in i.member_objs %}{{ m.get_full_name|default:m.username }}{% if not forloop.last %}, {% endif %}{% empty %}—{% endfor %}</td>
+<td>{{ i.scheduled_date|date:"d-m-Y" }}</td><td>{{ i.deadline|date:"d-m-Y" }}</td><td>{% include "inspections/_status.html" with s=i.status %}</td>
+<td class="nowrap"><a href="{% url 'assignment_edit' i.pk %}">Edit</a> · <a href="{% url 'assignment_permissions' i.pk %}">Sections</a>
+{% if i.status == 'NOT_STARTED' %} · <form class="inline" method="post" action="{% url 'assignment_delete' i.pk %}">{% csrf_token %}<button class="linkbtn danger" data-confirm="Delete this assignment?">Delete</button></form>{% endif %}</td></tr>
+{% empty %}<tr><td colspan="8" class="muted">No inspections scheduled.</td></tr>{% endfor %}
+</tbody></table></div></div>
+{% endblock %}

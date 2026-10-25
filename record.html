@@ -1,0 +1,45 @@
+{% extends "inspections/base.html" %}
+{% load static %}
+{% block title %}{{ insp.iti.name }} — Inspection record{% endblock %}
+{% block bodyclass %}form-page{% endblock %}
+{% block content %}
+<div class="formhead">
+  <div>
+    <h1>{{ insp.iti.name }}</h1>
+    <p class="muted">{{ insp.iti.mis_code }} · {{ insp.iti.district }} · {{ insp.team_name }} · Visit {{ insp.scheduled_date|date:"d M Y" }}</p>
+    <p>{% include "inspections/_status.html" with s=insp.status %}
+      {% if insp.submitted_at %}<span class="muted">Submitted {{ insp.submitted_at|date:"d M Y H:i" }} by {{ insp.submitted_by.get_full_name|default:insp.submitted_by.username }}</span>{% endif %}</p>
+    {% if insp.status == 'RETURNED' and insp.return_reason %}<div class="msg msg-warning"><strong>Returned:</strong> {{ insp.return_reason }}</div>{% endif %}
+  </div>
+  <div class="actions tight">
+    <a class="btn" href="{% url 'inspection_pdf' insp.pk %}">Download PDF</a>
+    <a class="btn" href="{% url 'inspection_xlsx' insp.pk %}">Download Excel</a>
+    {% if insp.status != 'SUBMITTED' and is_leader %}<a class="btn primary" href="{% url 'inspection_form' insp.pk %}">Edit</a>{% endif %}
+  </div>
+</div>
+{% if user_role == 'ADMIN' and insp.status == 'SUBMITTED' %}
+<details class="card returnbox">
+  <summary>Return this form to the team for correction</summary>
+  <form method="post" action="{% url 'inspection_return' insp.pk %}">{% csrf_token %}
+    <label>Reason / corrections required<textarea name="reason" rows="3" required></textarea></label>
+    <button class="btn danger" type="submit" data-confirm="Return this submitted inspection to the team for correction? The form will be unlocked for editing.">Return for correction</button>
+  </form>
+</details>
+{% endif %}
+<div class="formlayout">
+  <aside class="partnav" id="partnav"></aside>
+  <section id="formroot" class="formroot"><p class="muted">Loading…</p></section>
+</div>
+{% if history %}
+<div class="card"><h2>Record history</h2>
+<table class="table small"><thead><tr><th>Date / time</th><th>Action</th><th>By</th><th>Details</th></tr></thead><tbody>
+{% for h in history %}<tr><td>{{ h.timestamp|date:"d-m-Y H:i" }}</td><td>{{ h.action }}</td><td>{{ h.user.get_full_name|default:h.user.username|default:"—" }}</td><td>{{ h.details }}</td></tr>{% endfor %}
+</tbody></table></div>
+{% endif %}
+<div id="lightbox" class="lightbox" hidden><img alt=""><button type="button" class="btn">Close</button></div>
+{{ schema_json|json_script:"schema-data" }}
+{{ data_json|json_script:"form-data" }}
+{{ ctx_json|json_script:"ctx-data" }}
+{{ att_json|json_script:"att-data" }}
+{% endblock %}
+{% block scripts %}<script src="{% static 'inspections/form.js' %}"></script>{% endblock %}

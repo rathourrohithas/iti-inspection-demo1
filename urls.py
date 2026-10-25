@@ -1,0 +1,42 @@
+from django.urls import path
+
+from . import views, views_admin as va
+
+urlpatterns = [
+    path("", views.home, name="home"),
+    path("my-inspections/", views.my_inspections, name="my_inspections"),
+    path("inspection/<int:pk>/form/", views.inspection_form, name="inspection_form"),
+    path("inspection/<int:pk>/review/", views.inspection_review, name="inspection_review"),
+    path("inspection/<int:pk>/submit/", views.inspection_submit, name="inspection_submit"),
+    path("inspection/<int:pk>/return/", views.inspection_return, name="inspection_return"),
+    path("inspection/<int:pk>/", views.record_view, name="record_view"),
+    path("inspection/<int:pk>/pdf/", views.inspection_pdf, name="inspection_pdf"),
+    path("inspection/<int:pk>/xlsx/", views.inspection_xlsx, name="inspection_xlsx"),
+    path("api/inspection/<int:pk>/save/", views.api_save, name="api_save"),
+    path("api/inspection/<int:pk>/upload/", views.api_upload, name="api_upload"),
+    path("api/inspection/<int:pk>/attachment/<int:att_id>/delete/", views.api_delete_attachment, name="api_delete_attachment"),
+    path("attachment/<int:att_id>/", views.attachment_file, name="attachment_file"),
+    path("proforma-notes/", views.proforma_notes, name="proforma_notes"),
+    path("sw.js", views.service_worker, name="service_worker"),
+    path("manifest.webmanifest", views.manifest, name="manifest"),
+
+    path("dashboard/", va.dashboard, name="dashboard"),
+    path("records/", va.records, name="records"),
+    path("manage/users/", va.users_list, name="users_list"),
+    path("manage/users/new/", va.user_edit, name="user_create"),
+    path("manage/users/<int:pk>/", va.user_edit, name="user_edit"),
+    path("manage/itis/", va.itis_list, name="itis_list"),
+    path("manage/itis/new/", va.iti_edit, name="iti_create"),
+    path("manage/itis/<int:pk>/", va.iti_edit, name="iti_edit"),
+    path("manage/itis/import/", va.iti_import, name="iti_import"),
+    path("manage/itis/template.xlsx", va.iti_template, name="iti_template"),
+    path("manage/schedule/", va.assignments_list, name="assignments_list"),
+    path("manage/schedule/new/", va.assignment_edit, name="assignment_create"),
+    path("manage/schedule/<int:pk>/", va.assignment_edit, name="assignment_edit"),
+    path("manage/schedule/<int:pk>/permissions/", va.assignment_permissions, name="assignment_permissions"),
+    path("manage/schedule/<int:pk>/delete/", va.assignment_delete, name="assignment_delete"),
+    path("manage/schedule/import/", va.assignment_import, name="assignment_import"),
+    path("manage/schedule/template.xlsx", va.assignment_template, name="assignment_template"),
+    path("manage/settings/", va.portal_settings, name="portal_settings"),
+    path("manage/audit/", va.audit_view, name="audit_view"),
+]

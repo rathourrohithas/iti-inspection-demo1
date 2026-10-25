@@ -1,0 +1,32 @@
+{% extends "inspections/base.html" %}
+{% load static %}
+{% block title %}{{ insp.iti.name }} — Inspection{% endblock %}
+{% block bodyclass %}form-page{% endblock %}
+{% block content %}
+<div class="formhead">
+  <div>
+    <h1>{{ insp.iti.name }}</h1>
+    <p class="muted">{{ insp.iti.mis_code }} · {{ insp.iti.district }} · Visit {{ insp.scheduled_date|date:"d M Y" }} · Deadline {{ insp.deadline|date:"d M Y" }}</p>
+    {% if insp.status == 'RETURNED' and insp.return_reason %}<div class="msg msg-warning"><strong>Returned for correction:</strong> {{ insp.return_reason }}</div>{% endif %}
+  </div>
+  <div class="savebox">
+    <div class="progress-wrap"><div class="bar"><span id="pbar" style="width:0"></span></div><span id="ptext">0%</span></div>
+    <div id="savestate" class="savestate">All changes saved</div>
+    <div class="actions tight">
+      <button class="btn" type="button" id="btn-save">Save draft</button>
+      <a class="btn primary" href="{% url 'inspection_review' insp.pk %}" id="btn-review">Review{% if is_leader %} &amp; submit{% endif %}</a>
+    </div>
+  </div>
+</div>
+<div class="formlayout">
+  <aside class="partnav" id="partnav" aria-label="Sections of the proforma"></aside>
+  <section id="formroot" class="formroot" aria-live="polite"><p class="muted">Loading the proforma…</p></section>
+</div>
+<div id="lightbox" class="lightbox" hidden><img alt=""><button type="button" class="btn">Close</button></div>
+{{ schema_json|json_script:"schema-data" }}
+{{ data_json|json_script:"form-data" }}
+{{ ctx_json|json_script:"ctx-data" }}
+{{ att_json|json_script:"att-data" }}
+<form id="csrf-holder">{% csrf_token %}</form>
+{% endblock %}
+{% block scripts %}<script src="{% static 'inspections/form.js' %}"></script>{% endblock %}

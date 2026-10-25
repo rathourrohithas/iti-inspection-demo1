@@ -1,0 +1,34 @@
+{% extends "inspections/base.html" %}
+{% block title %}My inspections{% endblock %}
+{% block content %}
+<div class="pagehead"><h1>My inspections</h1></div>
+{% if not rows %}<div class="card"><p>No inspections are assigned to you yet.</p></div>{% endif %}
+<div class="cards">
+{% for r in rows %}{% with i=r.insp %}
+  <article class="card icard">
+    <div class="icard-top">
+      <h2>{{ i.iti.name }}</h2>
+      {% include "inspections/_status.html" with s=i.status %}
+    </div>
+    <p class="muted">{{ i.iti.mis_code }} · {{ i.iti.district }}{% if i.iti.block %} · {{ i.iti.block }}{% endif %}</p>
+    <dl class="kv">
+      <dt>Team</dt><dd>{{ i.team_name }} <span class="muted">({{ r.tm.get_role_display }})</span></dd>
+      <dt>Visit</dt><dd>{{ i.scheduled_date|date:"d M Y" }}</dd>
+      <dt>Deadline</dt><dd>{{ i.deadline|date:"d M Y" }}{% if i.is_overdue %} <span class="badge st-overdue">Overdue</span>{% endif %}</dd>
+      {% if r.tm.sections %}<dt>Your sections</dt><dd>{{ r.tm.sections|join:", " }}</dd>{% endif %}
+    </dl>
+    {% if i.status == 'RETURNED' and i.return_reason %}<div class="msg msg-warning"><strong>Returned:</strong> {{ i.return_reason }}</div>{% endif %}
+    <div class="bar"><span style="width: {% if i.status == 'SUBMITTED' %}100{% else %}{{ i.progress_pct }}{% endif %}%"></span></div>
+    <div class="actions">
+      {% if i.status == 'SUBMITTED' %}
+        <a class="btn" href="{% url 'record_view' i.pk %}">View record</a>
+        <a class="btn" href="{% url 'inspection_pdf' i.pk %}">PDF</a>
+      {% else %}
+        <a class="btn primary" href="{% url 'inspection_form' i.pk %}">{% if i.status == 'NOT_STARTED' %}Start inspection{% else %}Continue{% endif %}</a>
+        <a class="btn" href="{% url 'inspection_review' i.pk %}">Review{% if r.tm.role == 'LEADER' %} &amp; submit{% endif %}</a>
+      {% endif %}
+    </div>
+  </article>
+{% endwith %}{% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,16 @@
+{% extends "inspections/base.html" %}
+{% block title %}Inspection records{% endblock %}
+{% block content %}
+<div class="pagehead"><h1>Inspection records</h1>
+  <div class="actions tight"><a class="btn" href="?{{ qs }}&export=xlsx">Export Excel</a><a class="btn" href="?{{ qs }}&export=csv">Export CSV</a></div></div>
+{% include "inspections/_filters.html" %}
+<p class="muted">{{ page.paginator.count }} record(s). Exports include every field of the proforma for the filtered records, with original numbering.</p>
+<div class="card"><div class="tablewrap"><table class="table small"><thead><tr><th>ITI</th><th>District</th><th>Team</th><th>Visit</th><th>Inspection date</th><th>Submitted</th><th>Status</th><th>Downloads</th></tr></thead><tbody>
+{% for i in page %}<tr><td><a href="{% url 'record_view' i.pk %}">{{ i.iti.name }}</a><br><small class="muted">{{ i.iti.mis_code }}</small></td><td>{{ i.iti.district }}</td>
+<td>{{ i.team_name }}<br><small class="muted">{{ i.leader_obj.get_full_name|default:"" }}</small></td><td>{{ i.scheduled_date|date:"d-m-Y" }}</td><td>{{ i.inspection_date|default:"—" }}</td>
+<td>{{ i.submitted_at|date:"d-m-Y"|default:"—" }}</td><td>{% include "inspections/_status.html" with s=i.status %}</td>
+<td><a href="{% url 'inspection_pdf' i.pk %}">PDF</a> · <a href="{% url 'inspection_xlsx' i.pk %}">Excel</a></td></tr>
+{% empty %}<tr><td colspan="8" class="muted">No records.</td></tr>{% endfor %}
+</tbody></table></div>
+{% include "inspections/_pager.html" %}</div>
+{% endblock %}

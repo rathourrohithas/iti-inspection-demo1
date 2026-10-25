@@ -1,0 +1,9 @@
+{% extends "inspections/base.html" %}
+{% block title %}{% if obj %}Edit user{% else %}Add user{% endif %}{% endblock %}
+{% block content %}
+<div class="pagehead"><h1>{% if obj %}Edit user: {{ obj.username }}{% else %}Add user{% endif %}</h1><a class="btn" href="{% url 'users_list' %}">Back</a></div>
+<div class="card"><form method="post" class="formgrid" autocomplete="off">{% csrf_token %}
+{% include "inspections/_form_fields.html" %}
+<div class="actions"><button class="btn primary" type="submit">Save</button></div></form>
+<p class="help">Team leader and member roles are given per inspection on the Schedule page. Choose “Inspecting officer” for anyone who will inspect.</p></div>
+{% endblock %}

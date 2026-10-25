@@ -1,0 +1,10 @@
+{% extends "inspections/base.html" %}
+{% block title %}ITI master{% endblock %}
+{% block content %}
+<div class="pagehead"><h1>ITI master list</h1><div class="actions tight"><a class="btn" href="{% url 'iti_import' %}">Import from Excel / CSV</a><a class="btn primary" href="{% url 'iti_create' %}">Add ITI</a></div></div>
+<form method="get" class="searchbar"><input name="q" value="{{ q }}" placeholder="Search name, MIS code, district"><button class="btn">Search</button></form>
+<div class="card"><div class="tablewrap"><table class="table small"><thead><tr><th>Name of ITI</th><th>MIS code</th><th>Ownership</th><th>District / block</th><th>Principal</th><th class="num">Inspections</th><th></th></tr></thead><tbody>
+{% for i in itis %}<tr class="{% if not i.active %}muted{% endif %}"><td>{{ i.name }}</td><td>{{ i.mis_code }}</td><td>{{ i.get_ownership_display }}</td><td>{{ i.district }}<br><small class="muted">{{ i.block }}</small></td><td>{{ i.principal_name }}<br><small class="muted">{{ i.principal_mobile }}</small></td><td class="num">{{ i.n }}</td><td><a href="{% url 'iti_edit' i.pk %}">Edit</a></td></tr>
+{% empty %}<tr><td colspan="7" class="muted">No ITIs yet. Add them one by one or import a list.</td></tr>{% endfor %}
+</tbody></table></div></div>
+{% endblock %}

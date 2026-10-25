@@ -1,0 +1,9 @@
+{% extends "inspections/base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<div class="pagehead"><h1>{{ title }}</h1><a class="btn" href="{% url back %}">Back</a></div>
+<div class="card"><form method="post" class="formgrid">{% csrf_token %}
+  {% include "inspections/_form_fields.html" %}
+  <div class="actions"><button class="btn primary" type="submit">Save</button></div>
+</form></div>
+{% endblock %}

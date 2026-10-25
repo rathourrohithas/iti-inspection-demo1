@@ -1,0 +1,15 @@
+{% extends "inspections/base.html" %}
+{% block title %}Portal settings{% endblock %}
+{% block content %}
+<div class="pagehead"><h1>Portal settings</h1></div>
+<form method="post">{% csrf_token %}
+<div class="card formgrid"><h2>Uploads</h2>{% include "inspections/_form_fields.html" %}</div>
+<div class="card"><h2>Mandatory items ({{ n_mand }} selected)</h2>
+<p class="help">The approved proforma does not mark any item as compulsory, so nothing is mandatory by default. Tick items the team must answer before the leader can submit. Changes apply to all inspections not yet submitted.</p>
+{% for g in grouped %}{% if g.units %}<details class="mandgroup"><summary>{{ g.part.section }} · {{ g.part.title }}</summary>
+<ul class="plain">{% for x in g.units %}<li><label class="check"><input type="checkbox" name="mandatory" value="{{ x.u.key }}" {% if x.on %}checked{% endif %}> <b>{{ x.u.sno }}</b> {{ x.u.label|truncatechars:120 }}</label></li>{% endfor %}</ul></details>{% endif %}{% endfor %}
+</div>
+<div class="actions"><button class="btn primary" type="submit">Save settings</button></div>
+</form>
+<div class="card"><h2>Notes on the digital proforma</h2><p><a href="{% url 'proforma_notes' %}">View the corrections applied while digitising the proforma</a></p></div>
+{% endblock %}

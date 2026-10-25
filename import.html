@@ -1,0 +1,13 @@
+{% extends "inspections/base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<div class="pagehead"><h1>{{ title }}</h1><a class="btn" href="{% url back %}">Back</a></div>
+<div class="card">
+  <p>Columns: <code>{{ columns|join:", " }}</code></p>
+  <p class="help">{{ note }}</p>
+  <p><a class="btn" href="{% url template_url %}">Download template (.xlsx)</a></p>
+  <form method="post" enctype="multipart/form-data">{% csrf_token %}{% include "inspections/_form_fields.html" %}<button class="btn primary" type="submit">Import</button></form>
+</div>
+{% if report %}<div class="card"><h2>Import result</h2><p>Created: <b>{{ report.created }}</b> · Updated: <b>{{ report.updated }}</b> · Rows with errors: <b>{{ report.errors|length }}</b></p>
+{% if report.errors %}<ul class="small">{% for e in report.errors %}<li class="error">{{ e }}</li>{% endfor %}</ul>{% endif %}</div>{% endif %}
+{% endblock %}

@@ -1,0 +1,51 @@
+{% load static %}<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#1f3a5f">
+<title>{% block title %}{{ PORTAL_NAME }}{% endblock %} · DTE Himachal Pradesh</title>
+<link rel="stylesheet" href="{% static 'inspections/app.css' %}">
+<link rel="manifest" href="{% url 'manifest' %}">
+<link rel="icon" href="{% static 'inspections/icon.svg' %}" type="image/svg+xml">
+</head>
+<body class="{% block bodyclass %}{% endblock %}">
+<header class="topbar">
+  <div class="topbar-inner">
+    <a class="brand" href="{% url 'home' %}">
+      <img src="{% static 'inspections/icon.svg' %}" alt="" width="34" height="34">
+      <span><strong>{{ PORTAL_NAME }}</strong><small>{{ PORTAL_DEPARTMENT }}</small></span>
+    </a>
+    {% if user.is_authenticated %}
+    <button class="navtoggle" type="button" aria-label="Menu" data-toggle="nav">☰</button>
+    <nav id="nav" class="nav">
+      {% if user_role == 'ADMIN' or user_role == 'VIEWER' %}
+        <a href="{% url 'dashboard' %}">Dashboard</a>
+        <a href="{% url 'records' %}">Records</a>
+      {% endif %}
+      {% if user_role == 'ADMIN' %}
+        <a href="{% url 'assignments_list' %}">Schedule</a>
+        <a href="{% url 'itis_list' %}">ITIs</a>
+        <a href="{% url 'users_list' %}">Users</a>
+        <a href="{% url 'portal_settings' %}">Settings</a>
+        <a href="{% url 'audit_view' %}">Audit log</a>
+      {% endif %}
+      {% if user.inspection_roles.exists %}<a href="{% url 'my_inspections' %}">My inspections</a>{% endif %}
+      <span class="nav-user">{{ user.get_full_name|default:user.username }}</span>
+      <a href="{% url 'password_change' %}">Password</a>
+      <form method="post" action="{% url 'logout' %}" class="inline">{% csrf_token %}<button class="linkbtn" type="submit">Sign out</button></form>
+    </nav>
+    {% endif %}
+  </div>
+</header>
+{% if DEMO_MODE %}<div class="demobanner">Practice site for training. Enter sample data only — this is not the official portal.</div>{% endif %}
+<div id="netstatus" class="netstatus" hidden>You are offline. Entries are saved on this device and will be sent when the connection returns.</div>
+<main class="container">
+  {% if messages %}<div class="messages">{% for m in messages %}<div class="msg msg-{{ m.tags }}">{{ m }}</div>{% endfor %}</div>{% endif %}
+  {% block content %}{% endblock %}
+</main>
+<footer class="footer">{{ PORTAL_DEPARTMENT }} · Online ITI Inspection Portal</footer>
+<script src="{% static 'inspections/common.js' %}"></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

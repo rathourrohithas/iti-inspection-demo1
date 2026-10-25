@@ -1,0 +1,1 @@
+<span class="badge st-{{ s|lower }}">{% if s == 'NOT_STARTED' %}Not started{% elif s == 'IN_PROGRESS' %}In progress{% elif s == 'SUBMITTED' %}Submitted{% elif s == 'RETURNED' %}Returned for correction{% else %}{{ s }}{% endif %}</span>

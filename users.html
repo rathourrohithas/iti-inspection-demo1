@@ -1,0 +1,10 @@
+{% extends "inspections/base.html" %}
+{% block title %}Users{% endblock %}
+{% block content %}
+<div class="pagehead"><h1>User accounts</h1><a class="btn primary" href="{% url 'user_create' %}">Add user</a></div>
+<form method="get" class="searchbar"><input name="q" value="{{ q }}" placeholder="Search name, login, designation, office"><button class="btn">Search</button></form>
+<div class="card"><div class="tablewrap"><table class="table small"><thead><tr><th>Name</th><th>Login ID</th><th>Role</th><th>Designation / office</th><th>Mobile</th><th>Status</th><th></th></tr></thead><tbody>
+{% for u in users %}<tr><td>{{ u.get_full_name|default:"—" }}</td><td>{{ u.username }}</td><td>{{ u.profile.get_role_display }}</td><td>{{ u.profile.designation }}<br><small class="muted">{{ u.profile.office }}</small></td><td>{{ u.profile.mobile }}</td>
+<td>{% if u.is_active %}<span class="badge st-submitted">Active</span>{% else %}<span class="badge">Inactive</span>{% endif %}</td><td><a href="{% url 'user_edit' u.pk %}">Edit</a></td></tr>{% endfor %}
+</tbody></table></div></div>
+{% endblock %}

@@ -1,0 +1,9 @@
+<form method="get" class="filters card">
+  <label>District<select name="district"><option value="">All</option>{% for d in districts %}<option {% if f.district == d %}selected{% endif %}>{{ d }}</option>{% endfor %}</select></label>
+  <label>ITI (name / MIS code)<input name="iti" value="{{ f.iti }}"></label>
+  <label>Inspection team<input name="team" value="{{ f.team }}" placeholder="Team or officer name"></label>
+  <label>Visit from<input type="date" name="date_from" value="{{ f.date_from }}"></label>
+  <label>Visit to<input type="date" name="date_to" value="{{ f.date_to }}"></label>
+  <label>Status<select name="status"><option value="">All</option>{% for v, l in statuses %}<option value="{{ v }}" {% if f.status == v %}selected{% endif %}>{{ l }}</option>{% endfor %}</select></label>
+  <div class="actions tight"><button class="btn primary" type="submit">Apply</button><a class="btn" href="?">Clear</a></div>
+</form>
